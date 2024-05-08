@@ -10,10 +10,10 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     up_vote = models.ManyToManyField(
-        User, related_name="question_up_vote", through="Vote", blank=True
+        User, related_name="question_up_vote", through="QuestionVote", blank=True
     )
     down_vote = models.ManyToManyField(
-        User, related_name="question_down_vote", through="Vote", blank=True
+        User, related_name="question_down_vote", through="QuestionVote", blank=True
     )
 
 
@@ -22,16 +22,23 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)    
+    updated_at = models.DateTimeField(auto_now=True)
     up_vote = models.ManyToManyField(
-        User, related_name="answer_up_vote", through="Vote", blank=True
+        User, related_name="answer_up_vote", through="AnswerVote", blank=True
     )
     down_vote = models.ManyToManyField(
-        User, related_name="answer_down_vote", through="Vote", blank=True
+        User, related_name="answer_down_vote", through="AnswerVote", blank=True
     )
 
 
-class Vote(models.Model):
+class QuestionVote(models.Model):
+    choice = [("up", "upvote"), ("down", "downvote")]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.CharField(choices=choice)
+    value = models.IntegerField(choices=[(1, "upvote"), (2, "downvote")])
+
+
+class AnswerVote(models.Model):
     choice = [("up", "upvote"), ("down", "downvote")]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(choices=choice)
