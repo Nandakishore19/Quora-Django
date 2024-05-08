@@ -7,7 +7,8 @@ class Question(models.Model):
 
     title = models.CharField(max_length=500)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    time_posted = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     up_vote = models.ManyToManyField(
         User, related_name="question_up_vote", through="Vote", blank=True
     )
@@ -20,7 +21,8 @@ class Answer(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.TextField(blank=False)
-    time_posted = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)    
     up_vote = models.ManyToManyField(
         User, related_name="answer_up_vote", through="Vote", blank=True
     )
