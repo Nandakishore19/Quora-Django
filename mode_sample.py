@@ -8,9 +8,9 @@ class Question(models.Model):
     title = models.CharField(max_length=500)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     time_posted = models.DateTimeField(auto_now_add=True)
-    up_vote = models.ManyToManyField(User, related_name="question_up_vote", blank=True)
+    up_vote = models.ManyToManyField(User, related_name="question_up_vote", through="Vote",blank=True)
     down_vote = models.ManyToManyField(
-        User, related_name="question_down_vote", blank=True
+        User, related_name="question_down_vote", through="Vote",blank=True
     )
 
 
@@ -19,9 +19,9 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     Text = models.TextField(blank=False)
     time_posted = models.DateTimeField(auto_now_add=True)
-    up_vote = models.ManyToManyField(User, related_name="answer_up_vote", blank=True)
+    up_vote = models.ManyToManyField(User, related_name="answer_up_vote",through="Vote",blank=True)
     down_vote = models.ManyToManyField(
-        User, related_name="answer_down_vote", blank=True
+        User, related_name="answer_down_vote",through="Vote" ,blank=True
     )
 
 
