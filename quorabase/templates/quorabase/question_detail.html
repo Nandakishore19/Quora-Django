@@ -1,0 +1,16 @@
+{%extends "quorabase/base.html"%}
+{%block content%}
+{%for question in questions%}
+<article class="media content-section">
+    <img class="rounded-circle article-img " src="{{post.author.profile.image.url}}" alt="">
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" href="#">{{ question.author }}</a>  
+        <small class="text-muted">{{ question.created_at }}</small>
+      </div>
+      <h2><a class="article-title" href="#">{{ question.title }}</a></h2> <!--Question Here-->
+      <!-- <p class="article-content">{{ post.content }}</p> might remove -->
+    </div>
+  </article>
+{%endfor%}
+{%endblock content%}
