@@ -1,16 +1,45 @@
-{%extends "quorabase/base.html"%}
-{%block content%}
-{%for question in questions%}
+{%extends "quorabase/base.html"%} {%block content%}
+
 <article class="media content-section">
-    <img class="rounded-circle article-img " src="{{post.author.profile.image.url}}" alt="">
-    <div class="media-body">
-      <div class="article-metadata">
-        <a class="mr-2" href="#">{{ question.author }}</a>  
-        <small class="text-muted">{{ question.created_at }}</small>
-      </div>
-      <h2><a class="article-title" href="#">{{ question.title }}</a></h2> <!--Question Here-->
-      <!-- <p class="article-content">{{ post.content }}</p> might remove -->
+  <img
+    class="rounded-circle article-img"
+    src="{{object.author.profile.image.url}}"
+    alt=""
+  />
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="#">{{ object.author }}</a>
+      <small class="text-muted">{{ object.created_at }}</small>
+      {%if object.author == user%}
+        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{%url 'question-update' object.id%}">Update Question</a>
+        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'question-delete' object.id%}">Delete Question</a>
+      {%endif%}
     </div>
-  </article>
+    <h2 class="article-title">{{ object.title }}</h2>
+    <a class="btn btn-primary btn-sm mt-1 mb-1" href="{%url 'question-answer' object.id%}">Answer This Question</a>
+    <!-- Question Here -->
+    <!-- <p class="article-content">{{ post.content }}</p> might remove -->
+  </div>
+</article>
+
+{%if object.answer_set.count > 0 %}
+{% for answer in object.answer_set.all%}
+<article class="media content-section">
+ <div class="media-body">
+  <div class="article-metadata">
+    <a class="mr-2" href="#">{{ answer.author }}</a>
+    <small class="text-muted">{{ answer.created_at }}</small>
+    {%if answer.author == user%}
+      <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{%url 'answer-update' object.id answer.id answer.author%}">Update Answer</a>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'question-delete' answer.id%}">Delete Answer</a>
+    {%endif%}
+  </div>
+  <h2 class="article-title">{{ answer.text }}</h2>   <!-- Question Here -->
+  <!-- <p class="article-content">{{ post.content }}</p> might remove -->
+</div>
+</article>
 {%endfor%}
+{%else%}
+<h2>Oops!! No answers yet</h2>
+{%endif%}
 {%endblock content%}
