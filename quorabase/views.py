@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse,Http404
+from django.http import HttpResponse, Http404
 from .models import Question, Answer
 from django.views.generic import (
     ListView,
@@ -81,6 +81,7 @@ class QuestionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class AnswerView(LoginRequiredMixin, CreateView):
     model = Answer
     fields = ["text"]
+
     # success_url = ""
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -97,10 +98,9 @@ class AnswerView(LoginRequiredMixin, CreateView):
 # class AnswerDetailView(DetailView):
 #     model = Answer
 #     queryset = Answer.objects.all()
-class AnswerUpdateView(LoginRequiredMixin,UpdateView):
+class AnswerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Answer
     fields = ["text"]
-    
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -109,21 +109,30 @@ class AnswerUpdateView(LoginRequiredMixin,UpdateView):
         return super().form_valid(form)
 
     def test_func(self):
-        answer_id = self.kwargs.get('answer_pk')
+        answer_id = self.kwargs.get("answer_pk")
         print(answer_id)
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         return self.request.user.answer_set.filter(pk=answer_id).exists()
-     
-    def get_object(self, queryset=None):
-        answer_id = self.kwargs.get('answer_pk')
-        answer = Answer.objects.get(pk = answer_id)
-        return answer
-    
 
-class AnswerDeleteView(LoginRequiredMixin,DeleteView):
+    def get_object(self, queryset=None):
+        answer_id = self.kwargs.get("answer_pk")
+        answer = Answer.objects.get(pk=answer_id)
+        return answer
+
+
+class AnswerDeleteView(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
     model = Answer
     queryset = Answer.objects.all()
 
     def get_success_url(self) -> str:
-        question = self.kwargs.get('pk')
-        return reverse("{%url 'question-detail' question%}")
+        question = self.kwargs.get("question_pk")
+        return reverse("question-detail", kwargs={"pk": question})
+
+    def get_object(self, queryset=None):
+        answer_id = self.kwargs.get("answer_pk")
+        answer = Answer.objects.get(pk=answer_id)
+        return answer
+    def test_func(self):
+        answer = self.get_object()
+
+        return self.request.user == answer.author
