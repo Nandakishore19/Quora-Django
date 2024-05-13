@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, Http404
 from .models import Question, Answer
+from django.db.models import Count
 from django.views.generic import (
     ListView,
     CreateView,
@@ -11,6 +12,8 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
+from vote.models import VoteModel
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 # AskquestionView
@@ -38,6 +41,19 @@ class QuestionListView(ListView):
 class QuestionDetailView(DetailView):
     model = Question
     queryset = Question.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        question = self.get_object()  # Retrieve the current question object
+
+        # Annotate the queryset of answers with the count of votes
+        answers = question.answer_set.annotate(num_votes=Count("vote"))
+
+        # Order answers by the number of votes (descending) and then by created_at (descending)
+        answers = answers.order_by("-num_votes", "-created_at")
+
+        context["answers"] = answers  # Add ordered answers to the context
+        return context
 
 
 class AskQuestionView(LoginRequiredMixin, CreateView):
@@ -120,7 +136,7 @@ class AnswerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return answer
 
 
-class AnswerDeleteView(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
+class AnswerDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Answer
     queryset = Answer.objects.all()
 
@@ -132,7 +148,30 @@ class AnswerDeleteView(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
         answer_id = self.kwargs.get("answer_pk")
         answer = Answer.objects.get(pk=answer_id)
         return answer
+
     def test_func(self):
         answer = self.get_object()
 
         return self.request.user == answer.author
+
+
+@login_required
+def upvote_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    user = request.user
+    if user in question.vote.all():
+        question.vote.remove(user)
+    else:
+        question.vote.add(user)
+    return redirect("question-detail", pk=question_id)
+
+
+@login_required
+def upvote_answer(request, question_id, answer_id):
+    answer = get_object_or_404(Answer, pk=answer_id)
+    user = request.user
+    if user in answer.vote.all():
+        answer.vote.remove(user)
+    else:
+        answer.vote.add(user)
+    return redirect("question-detail", pk=answer.question_id)
