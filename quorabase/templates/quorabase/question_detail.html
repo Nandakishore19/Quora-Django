@@ -23,7 +23,7 @@
 </article>
 
 {%if object.answer_set.count > 0 %}
-{% for answer in object.answer_set.all%}
+{% for answer in answers%}
 <article class="media content-section">
  <div class="media-body">
   <div class="article-metadata">
@@ -31,10 +31,19 @@
     <small class="text-muted">{{ answer.created_at }}</small>
     {%if answer.author == user%}
       <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{%url 'answer-update' object.id answer.id answer.author%}">Update Answer</a>
-      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'question-delete' answer.id%}">Delete Answer</a>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'answer-delete' object.id answer.id%}">Delete Answer</a>
     {%endif%}
   </div>
-  <h2 class="article-title">{{ answer.text }}</h2>   <!-- Question Here -->
+  <h2 class="article-title">{{ answer.text }}</h2> 
+  <small class="text-muted">
+    Likes:{{answer.vote.count}}
+  </small>
+  <br>
+  {% if request.user in answer.vote.all%}
+  <a href="{%url 'upvote-answer' question_id=object.id answer_id=answer.id%}" class="btn btn-danger mt-2">Down Vote</a>
+  {%else%}
+  <a href="{%url 'upvote-answer' question_id=object.id answer_id=answer.id%}" class="btn btn-success mt-2">Up Vote</a>
+  {%endif%}  <!-- Question Here -->
   <!-- <p class="article-content">{{ post.content }}</p> might remove -->
 </div>
 </article>

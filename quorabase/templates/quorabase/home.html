@@ -8,7 +8,19 @@
         <a class="mr-2" href="#">{{ question.author }}</a>  
         <small class="text-muted">{{ question.created_at }}</small>
       </div>
+      
       <h2><a class="article-title" href="{%url 'question-detail' question.pk%}">{{ question.title }}</a></h2> <!--Question Here-->
+      <small class="text-muted">
+        Likes:{{question.vote.count}}
+      </small>
+      <br>
+      {% if request.user in question.vote.all%}
+      <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2">Down Vote</a>
+      {%else%}
+      <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2">Up Vote</a>
+      {%endif%}
+
+
       <!-- <p class="article-content">{{ post.content }}</p> might remove -->
     </div>
   </article>
