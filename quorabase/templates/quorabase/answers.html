@@ -1,5 +1,6 @@
 {% extends 'quorabase/base.html'%}
 {%block content%}
+{%if answers%}
 {%for answer in answers%}
 <article class="media content-section">
   <!-- <img class= "rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt=""> -->
@@ -17,4 +18,9 @@
   </div>
 </article>
 {% endfor %}
+{%else %}
+<h3>
+    {{view.kwargs.username}} is yet to answer any questions
+</h3>
+{%endif%}
 {%endblock content%}

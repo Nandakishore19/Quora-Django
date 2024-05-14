@@ -182,30 +182,28 @@ class AboutUser(ListView):
     model = Question
     template_name = "quorabase/about.html"
     context_object_name = "questions"
-    ordering = ["-vote"]
+    # ordering = ["-vote"]
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
-        return Question.objects.filter(author=user).order_by("-vote")
+        return Question.objects.filter(author=user)
 
 
-class UserPostQuestions(ListView):
+class UserPostQuestions(LoginRequiredMixin,ListView):
     model = Question
     context_object_name = "questions"
     template_name = "quorabase/questions.html"
-    ordering = ["-vote"]
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
-        return Question.objects.filter(author=user).order_by("-vote")
+        return Question.objects.filter(author=user).annotate(num_votes = Count("vote")).order_by("-num_votes")
 
 
-class UserPostAnswers(ListView):
+class UserPostAnswers(LoginRequiredMixin,ListView):
     model = Answer
     context_object_name = "answers"
     template_name = "quorabase/answers.html"
-    ordering = ["-vote"]
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
-        return Answer.objects.filter(author=user).order_by("-vote")
+        return Answer.objects.filter(author=user).annotate(num_votes = Count("vote")).order_by("-num_votes")
