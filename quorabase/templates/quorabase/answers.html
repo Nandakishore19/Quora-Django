@@ -1,0 +1,20 @@
+{% extends 'quorabase/base.html'%}
+{%block content%}
+{%for answer in answers%}
+<article class="media content-section">
+  <!-- <img class= "rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt=""> -->
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="{% url 'about-user' answer.author.username%}">{{ answer.author }}</a>
+      <small class="text-muted">{{ answer.date_posted|date:"M d Y D g:i:s"}}</small>
+    </div>
+    <h2><p>Question:</p><a class="article-title" href="{%url 'question-detail' answer.question.id %}">{{ answer.question.title }}</a></h2>
+    <div class="media content-section">
+
+        <h2 class="article-title"> {{ answer.text }}</h2>
+    </div>
+    <!-- <p class="article-content">{{ question.title }}</p> -->
+  </div>
+</article>
+{% endfor %}
+{%endblock content%}

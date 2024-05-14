@@ -12,10 +12,7 @@ class Question(models.Model):  # Table name quorabase_question
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    vote = models.ManyToManyField(
-        User, related_name="question_vote",  blank=True
-    )
-  
+    vote = models.ManyToManyField(User, related_name="question_vote", blank=True)
 
     def __str__(self) -> str:
         return f"{self.title}"
@@ -32,9 +29,7 @@ class Answer(models.Model):
     text = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    vote = models.ManyToManyField(
-        User, related_name="answer_vote", blank=True
-    )
+    vote = models.ManyToManyField(User, related_name="answer_vote", blank=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -48,6 +43,3 @@ class Answer(models.Model):
         self,
     ):  # Setting the instance of a specific question to the question detail url.
         return reverse("question-detail", kwargs={"pk": self.question_id})
-
-
-

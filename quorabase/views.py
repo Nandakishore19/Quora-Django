@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from vote.models import VoteModel
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # Create your views here.
 # AskquestionView
@@ -163,7 +164,7 @@ def upvote_question(request, question_id):
         question.vote.remove(user)
     else:
         question.vote.add(user)
-    return redirect("question-detail", pk=question_id)
+    return redirect("quora-home")
 
 
 @login_required
@@ -175,3 +176,36 @@ def upvote_answer(request, question_id, answer_id):
     else:
         answer.vote.add(user)
     return redirect("question-detail", pk=answer.question_id)
+
+
+class AboutUser(ListView):
+    model = Question
+    template_name = "quorabase/about.html"
+    context_object_name = "questions"
+    ordering = ["-vote"]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get("username"))
+        return Question.objects.filter(author=user).order_by("-vote")
+
+
+class UserPostQuestions(ListView):
+    model = Question
+    context_object_name = "questions"
+    template_name = "quorabase/questions.html"
+    ordering = ["-vote"]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get("username"))
+        return Question.objects.filter(author=user).order_by("-vote")
+
+
+class UserPostAnswers(ListView):
+    model = Answer
+    context_object_name = "answers"
+    template_name = "quorabase/answers.html"
+    ordering = ["-vote"]
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get("username"))
+        return Answer.objects.filter(author=user).order_by("-vote")

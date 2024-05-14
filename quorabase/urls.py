@@ -11,6 +11,9 @@ from .views import (
     AnswerDeleteView,
     upvote_answer,
     upvote_question,
+    AboutUser,
+    UserPostQuestions,
+    UserPostAnswers,
 )
 
 urlpatterns = [
@@ -43,6 +46,15 @@ urlpatterns = [
         "question/<int:question_id>/answer/<int:answer_id>/upvote/",
         upvote_answer,
         name="upvote-answer",
+    ),
+    path("user/<str:username>/", AboutUser.as_view(), name="about-user"),
+    path(
+        "user/<str:username>/questions/",
+        UserPostQuestions.as_view(),
+        name="user-questions",
+    ),
+    path(
+        "user/<str:username>/answers/", UserPostAnswers.as_view(), name="user-answers"
     ),
     # path("question/<int:pk>/answer/<str:username>/",AnswerDetailView.as_view(),name="answer-detail"),
 ]
