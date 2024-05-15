@@ -12,9 +12,9 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
-from vote.models import VoteModel
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 # Create your views here.
 # AskquestionView
@@ -47,19 +47,17 @@ class QuestionDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         question = self.get_object()  # Retrieve the current question object
 
-        # Annotate the queryset of answers with the count of votes
         answers = question.answer_set.annotate(num_votes=Count("vote"))
 
-        # Order answers by the number of votes (descending) and then by created_at (descending)
         answers = answers.order_by("-num_votes", "-created_at")
 
-        context["answers"] = answers  # Add ordered answers to the context
+        context["answers"] = answers
         return context
 
 
 class AskQuestionView(LoginRequiredMixin, CreateView):
     model = Question
-    fields = ["title","description"]
+    fields = ["title", "description"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -68,7 +66,7 @@ class AskQuestionView(LoginRequiredMixin, CreateView):
 
 class QuestionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Question
-    fields = ["title","description"]
+    fields = ["title", "description"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -95,7 +93,7 @@ class QuestionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
-class AnswerView(LoginRequiredMixin,UserPassesTestMixin, CreateView):
+class AnswerView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Answer
     fields = ["text"]
 
@@ -106,19 +104,13 @@ class AnswerView(LoginRequiredMixin,UserPassesTestMixin, CreateView):
 
     def test_func(self):
         question_id = self.kwargs.get("pk")
-        question = get_object_or_404(Question,pk= question_id)
-        return self.request.user !=question.author
-
-    # def get_context_data(self,**kwargs):
-    #     context = super(AnswerView,self).get_context_data(**kwargs)
-    #     question = Question.objects.get(self.kwargs['pk'])
-    #     context['question'] = question
-    # return context
+        try:
+            question = get_object_or_404(Question, pk=question_id)
+            return self.request.user != question.author
+        except Http404:
+            return False
 
 
-# class AnswerDetailView(DetailView):
-#     model = Answer
-#     queryset = Answer.objects.all()
 class AnswerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Answer
     fields = ["text"]
@@ -159,24 +151,38 @@ class AnswerDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def upvote_question(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    user = request.user
-    if user in question.vote.all():
-        question.vote.remove(user)
-    else:
-        question.vote.add(user)
-    return redirect("quora-home")
+    try:
+        question = get_object_or_404(Question, pk=question_id)
+        user = request.user
+        refer_url = request.META.get(
+            "HTTP_REFERER"
+        )  # retrieves the referer URL from the request headers
+        if user in question.vote.all():
+            question.vote.remove(user)
+        else:
+            question.vote.add(user)
+        # return redirect("quora-home")
+        if refer_url:
+            return redirect(refer_url)
+        else:
+            return redirect("quora-home")
+    except Http404:
+        return redirect("quora-home")
 
 
 @login_required
 def upvote_answer(request, answer_id):
-    answer = get_object_or_404(Answer, pk=answer_id)
-    user = request.user
-    if user in answer.vote.all():
-        answer.vote.remove(user)
-    else:
-        answer.vote.add(user)
-    return redirect("question-detail", pk=answer.question_id)
+    try:
+        answer = get_object_or_404(Answer, pk=answer_id)
+        user = request.user
+        if user in answer.vote.all():
+            answer.vote.remove(user)
+        else:
+            answer.vote.add(user)
+        return redirect("question-detail", pk=answer.question_id)
+    except Http404:
+        messages.error(request,"Answer doesnt exist")
+        return redirect("question-detail", pk=answer.question_id)
 
 
 class AboutUser(ListView):
@@ -188,23 +194,31 @@ class AboutUser(ListView):
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
         return Question.objects.filter(author=user)
+        
 
-
-class UserPostQuestions(LoginRequiredMixin,ListView):
+class UserPostQuestions(LoginRequiredMixin, ListView):
     model = Question
     context_object_name = "questions"
     template_name = "quorabase/questions.html"
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
-        return Question.objects.filter(author=user).annotate(num_votes = Count("vote")).order_by("-num_votes")
+        return (
+            Question.objects.filter(author=user)
+            .annotate(num_votes=Count("vote"))
+            .order_by("-num_votes")
+        )
 
 
-class UserPostAnswers(LoginRequiredMixin,ListView):
+class UserPostAnswers(LoginRequiredMixin, ListView):
     model = Answer
     context_object_name = "answers"
     template_name = "quorabase/answers.html"
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
-        return Answer.objects.filter(author=user).annotate(num_votes = Count("vote")).order_by("-num_votes")
+        return (
+            Answer.objects.filter(author=user)
+            .annotate(num_votes=Count("vote"))
+            .order_by("-num_votes")
+        )
