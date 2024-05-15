@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseForbidden
 from .models import Question, Answer
 from django.db.models import Count
 from django.views.generic import (
@@ -59,7 +59,7 @@ class QuestionDetailView(DetailView):
 
 class AskQuestionView(LoginRequiredMixin, CreateView):
     model = Question
-    fields = ["title"]
+    fields = ["title","description"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -68,7 +68,7 @@ class AskQuestionView(LoginRequiredMixin, CreateView):
 
 class QuestionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Question
-    fields = ["title"]
+    fields = ["title","description"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -95,15 +95,19 @@ class QuestionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
-class AnswerView(LoginRequiredMixin, CreateView):
+class AnswerView(LoginRequiredMixin,UserPassesTestMixin, CreateView):
     model = Answer
     fields = ["text"]
 
-    # success_url = ""
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.question_id = self.kwargs["pk"]
         return super().form_valid(form)
+
+    def test_func(self):
+        question_id = self.kwargs.get("pk")
+        question = get_object_or_404(Question,pk= question_id)
+        return self.request.user !=question.author
 
     # def get_context_data(self,**kwargs):
     #     context = super(AnswerView,self).get_context_data(**kwargs)
@@ -122,13 +126,10 @@ class AnswerUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.question_id = self.kwargs["question_pk"]
-        # import pdb; pdb.set_trace()
         return super().form_valid(form)
 
     def test_func(self):
         answer_id = self.kwargs.get("answer_pk")
-        print(answer_id)
-        # import pdb; pdb.set_trace()
         return self.request.user.answer_set.filter(pk=answer_id).exists()
 
     def get_object(self, queryset=None):
@@ -168,7 +169,7 @@ def upvote_question(request, question_id):
 
 
 @login_required
-def upvote_answer(request, question_id, answer_id):
+def upvote_answer(request, answer_id):
     answer = get_object_or_404(Answer, pk=answer_id)
     user = request.user
     if user in answer.vote.all():
