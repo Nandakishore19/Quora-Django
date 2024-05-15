@@ -43,7 +43,7 @@ urlpatterns = [
     ),
     path("question/upvote/<int:question_id>", upvote_question, name="upvote-question"),
     path(
-        "question/<int:question_id>/answer/<int:answer_id>/upvote/",
+        "answer/upvote/<int:answer_id>/",
         upvote_answer,
         name="upvote-answer",
     ),
