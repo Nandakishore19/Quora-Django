@@ -24,6 +24,8 @@
       {%endif%}
     </div>
     <h2 class="article-title">{{ object.title }}</h2>
+    <p class="article-content">{{ object.description }}</p> 
+
     {% if object.author != user%}
     <a
       class="btn btn-primary btn-sm mt-1 mb-1"
@@ -59,19 +61,18 @@
     <br />
     {% if request.user in answer.vote.all%}
     <a
-      href="{%url 'upvote-answer' question_id=object.id answer_id=answer.id%}"
+      href="{%url 'upvote-answer'  answer_id=answer.id%}"
       class="btn btn-danger mt-2"
       >Down Vote</a
     >
     {%else%}
     <a
-      href="{%url 'upvote-answer' question_id=object.id answer_id=answer.id%}"
+      href="{%url 'upvote-answer' answer_id=answer.id%}"
       class="btn btn-success mt-2"
       >Up Vote</a
     >
     {%endif%}
     <!-- Question Here -->
-    <!-- <p class="article-content">{{ post.content }}</p> might remove -->
   </div>
 </article>
 {%endfor%} {%else%}

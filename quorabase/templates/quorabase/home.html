@@ -2,7 +2,7 @@
 <a href="{% url 'ask-question' %}" style="text-decoration: none">
   <div class="card mb-2 mt-2">
     <div class="card-body">
-        <h3 class="fw-bold">
+        <h3 class="fw-bold link">
           What is your question?
         </h3>
     </div>
@@ -23,10 +23,10 @@
 
     <h2>
       <a class="article-title" href="{%url 'question-detail' question.pk%}"
-        >{{ question.title }}</a
-      >
+        >{{ question.title }}</a>
     </h2>
     <!--Question Here-->
+    <p class="article-content">{{ question.description }}</p>
     <small class="text-muted"> Likes:{{question.vote.count}} </small>
     <br />
     {% if request.user in question.vote.all%}
@@ -35,11 +35,9 @@
     >
     {%else%}
     <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2"
-      >Up Vote</a
-    >
+      >Up Vote</a>
     {%endif%}
 
-    <!-- <p class="article-content">{{ post.content }}</p> might remove -->
   </div>
 </article>
 {%endfor%}

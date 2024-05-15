@@ -11,7 +11,7 @@
     </div>
     <small class="text-muted"> Likes:{{question.vote.count}} </small>
     <h2><a class="article-title" href="{%url 'question-detail' question.id %}">{{ question.title }}</a></h2>
-    <!-- <p class="article-content">{{ question.title }}</p> -->
+    <p class="article-content">{{ question.description }}</p>
   </div>
 </article>
 {% endfor %}
