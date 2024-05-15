@@ -25,15 +25,18 @@
     </div>
     <h2 class="article-title">{{ object.title }}</h2>
     <p class="article-content">{{ object.description }}</p> 
-
+    <small class="text-muted"> Likes:{{question.vote.count}} </small>
     {% if object.author != user%}
-    <a
-      class="btn btn-primary btn-sm mt-1 mb-1"
-      href="{%url 'question-answer' object.id%}"
-      >Answer This Question</a>
+    <a class="btn btn-primary btn-sm mt-1 mb-1" href="{%url 'question-answer' object.id%}">Answer This Question</a>
       {%endif%}
-    <!-- Question Here -->
-    <!-- <p class="article-content">{{ post.content }}</p> might remove -->
+      {% if request.user in question.vote.all%}
+      <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2"
+        >Down Vote</a
+      >
+      {%else%}
+      <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2"
+        >Up Vote</a>
+      {%endif%}
   </div>
 </article>
 
@@ -58,7 +61,7 @@
     </div>
     <h2 class="article-title">{{ answer.text }}</h2>
     <small class="text-muted"> Likes:{{answer.vote.count}} </small>
-    <br />
+    <br>
     {% if request.user in answer.vote.all%}
     <a
       href="{%url 'upvote-answer'  answer_id=answer.id%}"
