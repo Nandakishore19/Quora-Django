@@ -56,5 +56,4 @@ urlpatterns = [
     path(
         "user/<str:username>/answers/", UserPostAnswers.as_view(), name="user-answers"
     ),
-    # path("question/<int:pk>/answer/<str:username>/",AnswerDetailView.as_view(),name="answer-detail"),
 ]

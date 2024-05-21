@@ -181,7 +181,7 @@ def upvote_answer(request, answer_id):
             answer.vote.add(user)
         return redirect("question-detail", pk=answer.question_id)
     except Http404:
-        messages.error(request,"Answer doesnt exist")
+        messages.error(request, "Answer doesnt exist")
         return redirect("question-detail", pk=answer.question_id)
 
 
@@ -189,12 +189,11 @@ class AboutUser(ListView):
     model = Question
     template_name = "quorabase/about.html"
     context_object_name = "questions"
-    # ordering = ["-vote"]
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get("username"))
         return Question.objects.filter(author=user)
-        
+
 
 class UserPostQuestions(LoginRequiredMixin, ListView):
     model = Question

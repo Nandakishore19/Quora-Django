@@ -1,20 +1,16 @@
-{%extends "quorabase/base.html"%} {%block content%} 
-<a class = "link-opacity-75-hover" href="{% url 'ask-question' %}" style="text-decoration: none">
+{%extends "quorabase/base.html"%} {%block content%}
+<a class="link-opacity-75-hover" href="{% url 'ask-question' %}">
   <div class="card mb-2 mt-2">
     <div class="card-body">
-        <h3 class="fw-bold ">
-          What is your question?
-        </h3>
+      <h3 class="fw-bold ">
+        What is your question?
+      </h3>
     </div>
   </div>
 </a>
 {%for question in questions%}
 <article class="media content-section">
-  <img
-    class="rounded-circle article-img"
-    src="{{ question.author.profile.image.url }}"
-    alt=""
-  />
+  <img class="rounded-circle article-img" src="{{ question.author.profile.image.url }}" alt="" />
   <div class="media-body">
     <div class="article-metadata">
       <a class="mr-2" href="{%url 'about-user' question.author.username %}">{{ question.author }}</a>
@@ -22,20 +18,16 @@
     </div>
 
     <h2>
-      <a class="article-title" href="{%url 'question-detail' question.pk%}"
-        >{{ question.title }}</a>
+      <a class="article-title" href="{%url 'question-detail' question.pk%}">{{ question.title }}</a>
     </h2>
     <!--Question Here-->
     <p class="article-content">{{ question.description }}</p>
     <small class="text-muted"> Likes:{{question.vote.count}} </small>
     <br />
     {% if request.user in question.vote.all%}
-    <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2"
-      >Down Vote</a
-    >
+    <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2">Down Vote</a>
     {%else%}
-    <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2"
-      >Up Vote</a>
+    <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2">Up Vote</a>
     {%endif%}
 
   </div>

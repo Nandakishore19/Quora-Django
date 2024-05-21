@@ -1,42 +1,27 @@
 {%extends "quorabase/base.html"%} {%block content%}
 
 <article class="media content-section">
-  <img
-    class="rounded-circle article-img"
-    src="{{object.author.profile.image.url}}"
-    alt=""
-  />
+  <img class="rounded-circle article-img" src="{{object.author.profile.image.url}}" alt="" />
   <div class="media-body">
     <div class="article-metadata">
       <a class="mr-2" href="{%url 'about-user' question.author.username %}">{{ object.author }}</a>
       <small class="text-muted">{{ object.created_at }}</small>
       {%if object.author == user%}
-      <a
-        class="btn btn-secondary btn-sm mt-1 mb-1"
-        href="{%url 'question-update' object.id%}"
-        >Update Question</a
-      >
-      <a
-        class="btn btn-danger btn-sm mt-1 mb-1"
-        href="{%url 'question-delete' object.id%}"
-        >Delete Question</a
-      >
+      <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{%url 'question-update' object.id%}">Update Question</a>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'question-delete' object.id%}">Delete Question</a>
       {%endif%}
     </div>
     <h2 class="article-title">{{ object.title }}</h2>
-    <p class="article-content">{{ object.description }}</p> 
+    <p class="article-content">{{ object.description }}</p>
     <small class="text-muted"> Likes:{{question.vote.count}} </small>
     {% if object.author != user%}
     <a class="btn btn-primary btn-sm mt-1 mb-1" href="{%url 'question-answer' object.id%}">Answer This Question</a>
-      {%endif%}
-      {% if request.user in question.vote.all%}
-      <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2"
-        >Down Vote</a
-      >
-      {%else%}
-      <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2"
-        >Up Vote</a>
-      {%endif%}
+    {%endif%}
+    {% if request.user in question.vote.all%}
+    <a href="{%url 'upvote-question' question.id%}" class="btn btn-danger mt-2">Down Vote</a>
+    {%else%}
+    <a href="{%url 'upvote-question' question.id%}" class="btn btn-success mt-2">Up Vote</a>
+    {%endif%}
   </div>
 </article>
 
@@ -47,33 +32,18 @@
       <a class="mr-2" href="{%url 'about-user' answer.author.username %}">{{ answer.author }}</a>
       <small class="text-muted">{{ answer.created_at }}</small>
       {%if answer.author == user%}
-      <a
-        class="btn btn-secondary btn-sm mt-1 mb-1"
-        href="{%url 'answer-update' object.id answer.id answer.author%}"
-        >Update Answer</a
-      >
-      <a
-        class="btn btn-danger btn-sm mt-1 mb-1"
-        href="{%url 'answer-delete' object.id answer.id%}"
-        >Delete Answer</a
-      >
+      <a class="btn btn-secondary btn-sm mt-1 mb-1"
+        href="{%url 'answer-update' object.id answer.id answer.author%}">Update Answer</a>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{%url 'answer-delete' object.id answer.id%}">Delete Answer</a>
       {%endif%}
     </div>
     <h2 class="article-title">{{ answer.text }}</h2>
     <small class="text-muted"> Likes:{{answer.vote.count}} </small>
     <br>
     {% if request.user in answer.vote.all%}
-    <a
-      href="{%url 'upvote-answer'  answer_id=answer.id%}"
-      class="btn btn-danger mt-2"
-      >Down Vote</a
-    >
+    <a href="{%url 'upvote-answer'  answer_id=answer.id%}" class="btn btn-danger mt-2">Down Vote</a>
     {%else%}
-    <a
-      href="{%url 'upvote-answer' answer_id=answer.id%}"
-      class="btn btn-success mt-2"
-      >Up Vote</a
-    >
+    <a href="{%url 'upvote-answer' answer_id=answer.id%}" class="btn btn-success mt-2">Up Vote</a>
     {%endif%}
     <!-- Question Here -->
   </div>
