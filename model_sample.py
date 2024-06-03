@@ -35,14 +35,12 @@ class QuestionVote(models.Model):
     choice = [("up", "upvote"), ("down", "downvote")]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(choices=choice)
-    value = models.IntegerField(choices=[(1, "upvote"), (2, "downvote")])
 
 
 class AnswerVote(models.Model):
     choice = [("up", "upvote"), ("down", "downvote")]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(choices=choice)
-    value = models.IntegerField(choices=[(1, "upvote"), (2, "downvote")])
 
 
 class Profile(models.Model):

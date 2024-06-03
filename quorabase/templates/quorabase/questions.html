@@ -1,0 +1,23 @@
+{% extends 'quorabase/base.html'%}
+{%block content%}
+{%if questions%}
+{%for question in questions%}
+<article class="media content-section">
+  <!-- <img class= "rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt=""> -->
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="{% url 'about-user' question.author.username%}">{{ question.author }}</a>
+      <small class="text-muted">{{ question.date_posted|date:"M d Y D g:i:s"}}</small>
+    </div>
+    <small class="text-muted"> Likes:{{question.vote.count}} </small>
+    <h2><a class="article-title" href="{%url 'question-detail' question.id %}">{{ question.title }}</a></h2>
+    <p class="article-content">{{ question.description }}</p>
+  </div>
+</article>
+{% endfor %}
+{%else %}
+<h3>
+  {{view.kwargs.username}} is yet to ask any questions
+</h3>
+{%endif%}
+{%endblock content%}
